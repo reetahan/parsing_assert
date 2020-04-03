@@ -3,5 +3,5 @@
 Run with the following command:
 
 ```bash
-python ast_assert_script.py [filename] [function_name]
+python filename function_name [-c class_name] [-o output_filename]
 ```

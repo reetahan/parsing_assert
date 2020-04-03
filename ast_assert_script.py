@@ -4,7 +4,7 @@ import sys
 
 def main():
 
-	filename,function, class_name = get_filename_function_class()
+	filename,function, class_name, output_filename = get_filename_function_class_outfile()
 	if(not filename):
 		return
 
@@ -22,7 +22,7 @@ def main():
 		if(analysis.function_list == old_list):
 			analysis.function_list = []
 
-	write_file("results.out", analysis.line_list)
+	write_file(output_filename, analysis.line_list)
 	f.close()
 
 #TO-DO recursive cycle detection
@@ -107,15 +107,38 @@ class Analysis(ast.NodeVisitor):
 			self.generic_visit(node)
 		
 
-def get_filename_function_class():
-	if(len(sys.argv) < 3 or len(sys.argv) > 4):
-		return None, None
+def get_filename_function_class_outfile():
+	if(len(sys.argv) != 3 and len(sys.argv) != 5 and len(sys.argv) != 7):
+		print_usage()
+		return None, None, None
 	filename = str(sys.argv[1])
 	function = str(sys.argv[2])
 	class_name = None
-	if(len(sys.argv) == 4):
-		class_name = str(sys.argv[3])
-	return filename,function,class_name
+	output_filename = "results.out"
+
+	if(len(sys.argv) == 5):
+		if(str(sys.argv[3]) != '-c' and str(sys.argv[3]) != '-o'):
+			print_usage()
+			return None,None,None
+		if(str(sys.argv[3]) != '-c'):
+			class_name = str(sys.argv[4])
+		if(str(sys.argv[3]) != '-o'):
+			output_filename = str(sys.argv[4])
+
+	if(len(sys.argv) == 7):
+		if(str(sys.argv[3]) == '-c' and str(sys.argv[5]) == '-o'):
+			class_name = str(sys.argv[4])
+			output_filename = str(sys.argv[6])
+		elif(str(sys.argv[3]) == '-o' and str(sys.argv[5]) == '-c'):
+			class_name = str(sys.argv[6])
+			output_filename = str(sys.argv[4])
+		else:
+			print_usage()
+
+	return filename,function,class_name,output_filename
+
+def print_usage():
+	print("USAGE: python filename function_name [-c class_name] [-o output_filename]")
 
 def write_file(results_file,line_list):
 	with open(results_file, "w") as f:
