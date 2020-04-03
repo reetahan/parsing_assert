@@ -4,7 +4,7 @@ import sys
 
 def main():
 
-	filename,function = get_filename_and_function()
+	filename,function, class_name = get_filename_function_class()
 	if(not filename):
 		return
 
@@ -13,7 +13,7 @@ def main():
 	f = open(filename)
 	lines = f.readlines()
 
-	analysis = Analysis(function,filename,lines)
+	analysis = Analysis(function,filename,class_name,lines)
 	analysis.visit(tree)
 	while(len(analysis.function_list) > 0):
 		old_list = analysis.function_list
@@ -28,8 +28,9 @@ def main():
 #TO-DO recursive cycle detection
 
 class Analysis(ast.NodeVisitor):
-	def __init__(self, target_func,filename,file_lines):
-		self.target = target_func
+	def __init__(self, target_func,filename,class_name,file_lines):
+		self.target_function = target_func
+		self.target_class = class_name
 		self.filename = filename
 		self.engage = False
 		self.lines = file_lines
@@ -72,7 +73,7 @@ class Analysis(ast.NodeVisitor):
 									'assert_not_equals']
 
 	def visit_FunctionDef(self, node):
-		if(node.name == self.target):
+		if(node.name == self.target_function):
 			self.engage = True
 			self.generic_visit(node)
 		if(node.name in self.function_list):
@@ -91,6 +92,8 @@ class Analysis(ast.NodeVisitor):
 			if(str(node.func.attr) in self.special_name_list):
 				line_num = node.lineno - 1
 				self.line_list.append(self.filename + ':' + str(line_num+1) + ' ' + self.lines[line_num])
+			else:
+				self.function_list.append(node.func.attr)
 			
 		if(str(type(node.func)) == '<class \'_ast.Name\'>'):
 			if(str(node.func.id) in self.special_name_list):
@@ -99,14 +102,20 @@ class Analysis(ast.NodeVisitor):
 			else:
 				self.function_list.append(node.func.id)
 			
+	def visit_ClassDef(self,node):
+		if(node.name == self.target_class or self.target_class == None):
+			self.generic_visit(node)
+		
 
-def get_filename_and_function():
-	if(len(sys.argv) != 3):
-		print("Please provide a script to execute (only one script), and one function name only")
+def get_filename_function_class():
+	if(len(sys.argv) < 3 or len(sys.argv) > 4):
 		return None, None
 	filename = str(sys.argv[1])
 	function = str(sys.argv[2])
-	return filename,function
+	class_name = None
+	if(len(sys.argv) == 4):
+		class_name = str(sys.argv[3])
+	return filename,function,class_name
 
 def write_file(results_file,line_list):
 	with open(results_file, "w") as f:
