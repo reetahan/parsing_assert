@@ -1,0 +1,6 @@
+../pyro/tests/integration_tests/test_conjugate_gaussian_models.py:183         assert_equal(0.0, max_errors[0], prec=prec)
+../pyro/tests/integration_tests/test_conjugate_gaussian_models.py:184         assert_equal(0.0, max_errors[1], prec=prec)
+../pyro/tests/integration_tests/test_conjugate_gaussian_models.py:185         assert_equal(0.0, max_errors[2], prec=prec)
+../pyro/tests/integration_tests/test_conjugate_gaussian_models.py:183         assert_equal(0.0, max_errors[0], prec=prec)
+../pyro/tests/integration_tests/test_conjugate_gaussian_models.py:184         assert_equal(0.0, max_errors[1], prec=prec)
+../pyro/tests/integration_tests/test_conjugate_gaussian_models.py:185         assert_equal(0.0, max_errors[2], prec=prec)
